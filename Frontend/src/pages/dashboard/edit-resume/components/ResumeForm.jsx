@@ -13,8 +13,8 @@ import ThemeColor from "./ThemeColor";
 
 function ResumeForm() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [enanbledNext, setEnabledNext] = useState(true);
-  const [enanbledPrev, setEnabledPrev] = useState(true);
+  const [enabledNext, setEnabledNext] = useState(true);
+  const [enabledPrev, setEnabledPrev] = useState(true);
   const resumeInfo = useSelector((state) => state.editResume.resumeData);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function ResumeForm() {
             <Button
               size="sm"
               className="text-sm gap-2"
-              disabled={!enanbledPrev}
+              disabled={!enabledPrev}
               onClick={() => {
                 if (currentIndex === 0) return;
                 setCurrentIndex(currentIndex - 1);
@@ -63,7 +63,7 @@ function ResumeForm() {
             <Button
               size="sm"
               className="gap-2"
-              disabled={!enanbledNext}
+              disabled={!enabledNext}
               onClick={() => {
                 if (currentIndex >= 5) return;
                 setCurrentIndex(currentIndex + 1);
@@ -77,21 +77,21 @@ function ResumeForm() {
       {currentIndex === 0 && (
         <PersonalDetails
           resumeInfo={resumeInfo}
-          enanbledNext={setEnabledNext}
+          enabledNext={setEnabledNext}
         />
       )}
       {currentIndex === 1 && (
         <Summary
           resumeInfo={resumeInfo}
-          enanbledNext={setEnabledNext}
-          enanbledPrev={setEnabledPrev}
+          enabledNext={setEnabledNext}
+          enabledPrev={setEnabledPrev}
         />
       )}
       {currentIndex === 2 && (
         <Experience
           resumeInfo={resumeInfo}
-          enanbledNext={setEnabledNext}
-          enanbledPrev={setEnabledPrev}
+          enabledNext={setEnabledNext}
+          enabledPrev={setEnabledPrev}
         />
       )}
       {currentIndex === 3 && (
@@ -104,15 +104,15 @@ function ResumeForm() {
       {currentIndex === 4 && (
         <Education
           resumeInfo={resumeInfo}
-          enanbledNext={setEnabledNext}
+          enabledNext={setEnabledNext}
           enabledPrev={setEnabledPrev}
         />
       )}
       {currentIndex === 5 && (
         <Skills
           resumeInfo={resumeInfo}
-          enanbledNext={setEnabledNext}
-          enanbledPrev={setEnabledNext}
+          enabledNext={setEnabledNext}
+          enabledPrev={setEnabledPrev}
         />
       )}
     </div>

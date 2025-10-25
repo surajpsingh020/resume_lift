@@ -20,7 +20,7 @@ const formFields = {
   endDate: "",
   description: "",
 };
-function Education({ resumeInfo, enanbledNext }) {
+function Education({ resumeInfo, enabledNext }) {
   const [educationalList, setEducationalList] = React.useState(
     resumeInfo?.education || [{ ...formFields }]
   );

@@ -48,7 +48,7 @@ function ExperiencePreview({ resumeInfo }) {
             </span>
           </h2>
           {/* <p className='text-xs my-2'>
-                    {experience.workSummery}
+                    {experience.workSummary}
                 </p> */}
           <div
             className="text-xs my-2"

@@ -11,7 +11,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { updateThisResume } from "@/Services/resumeAPI";
 
-function Skills({ resumeInfo, enanbledNext }) {
+function Skills({ resumeInfo, enabledNext, enabledPrev }) {
   const [loading, setLoading] = React.useState(false);
   const [skillsList, setSkillsList] = React.useState(
     resumeInfo?.skills || [

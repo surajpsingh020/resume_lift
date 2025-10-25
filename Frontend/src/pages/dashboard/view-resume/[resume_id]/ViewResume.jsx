@@ -31,11 +31,10 @@ function ViewResume() {
         <div id="noPrint">
           <div className="my-10 mx-10 md:mx-20 lg:mx-36">
             <h2 className="text-center text-2xl font-medium">
-              Congrats! Your Ultimate AI generates Resume is ready !{" "}
+              Congrats! Your Ultimate AI generated Resume is ready !{" "}
             </h2>
             <p className="text-center text-gray-400">
-              Now you are ready to download your resume and you can share unique
-              resume url with your friends and family{" "}
+              Now you can download your resume and share your unique resume URL with your friends and family.{" "}
             </p>
             <div className="flex justify-between px-44 my-10">
               <Button onClick={HandleDownload}>Download</Button>

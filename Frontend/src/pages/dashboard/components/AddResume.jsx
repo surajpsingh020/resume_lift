@@ -53,7 +53,7 @@ function AddResume() {
           <DialogHeader>
             <DialogTitle>Create a New Resume</DialogTitle>
             <DialogDescription>
-              Add a title and Description to your new resume
+              Add a title and description to your new resume
               <Input
                 className="my-3"
                 type="text"

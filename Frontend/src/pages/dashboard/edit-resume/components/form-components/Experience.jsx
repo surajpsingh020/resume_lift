@@ -20,7 +20,7 @@ const formFields = {
   currentlyWorking: "",
   workSummary: "",
 };
-function Experience({ resumeInfo, enanbledNext, enanbledPrev }) {
+function Experience({ resumeInfo, enabledNext, enabledPrev }) {
   const [experienceList, setExperienceList] = React.useState(
     resumeInfo?.experience || []
   );
@@ -54,8 +54,8 @@ function Experience({ resumeInfo, enanbledNext, enanbledPrev }) {
   };
 
   const handleChange = (e, index) => {
-    enanbledNext(false);
-    enanbledPrev(false);
+    enabledNext(false);
+    enabledPrev(false);
     const { name, value } = e.target;
     const list = [...experienceList];
     const newListData = {
@@ -93,8 +93,8 @@ function Experience({ resumeInfo, enanbledNext, enanbledPrev }) {
           toast("Error updating resume", `${error.message}`);
         })
         .finally(() => {
-          enanbledNext(true);
-          enanbledPrev(true);
+          enabledNext(true);
+          enabledPrev(true);
           setLoading(false);
         });
     }

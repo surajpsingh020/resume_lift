@@ -8,7 +8,7 @@ import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { updateThisResume } from "@/Services/resumeAPI";
 
-function PersonalDetails({ resumeInfo, enanbledNext }) {
+function PersonalDetails({ resumeInfo, enabledNext }) {
   const { resume_id } = useParams();
   const dispatch = useDispatch();
   const [loading, setLoading] = React.useState(false);
@@ -22,7 +22,7 @@ function PersonalDetails({ resumeInfo, enanbledNext }) {
   });
 
   const handleInputChange = (e) => {
-    enanbledNext(false);
+    enabledNext(false);
     dispatch(
       addResumeData({
         ...resumeInfo,
@@ -57,7 +57,7 @@ function PersonalDetails({ resumeInfo, enanbledNext }) {
         toast(error.message, `failed`);
         console.log(error.message);
       } finally {
-        enanbledNext(true);
+        enabledNext(true);
         setLoading(false);
       }
     }
