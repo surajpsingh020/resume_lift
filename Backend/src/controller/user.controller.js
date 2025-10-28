@@ -100,9 +100,10 @@ const loginUser = async (req, res) => {
       return res.status(406).json(new ApiError(406, "Invalid credentials."));
     }
 
+    const jwtSecret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
     const jwtToken = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET_KEY,
+      jwtSecret,
       { expiresIn: process.env.JWT_SECRET_EXPIRES_IN } // Add token expiration for better security
     );
 

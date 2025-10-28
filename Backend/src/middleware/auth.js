@@ -11,7 +11,8 @@ const isUserAvailable = async (req, res, next) => {
   }
 
   try {
-    const decodedToken = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const jwtSecret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
+    const decodedToken = await jwt.verify(token, jwtSecret);
     const user = await User.findById(decodedToken.id);
 
     if (!user) {
