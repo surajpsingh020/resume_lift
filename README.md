@@ -9,9 +9,7 @@ AI Resume Builder is a sophisticated web application that leverages artificial i
 - [Installation](#installation)  
   - [Setup with Docker](#setup-with-docker)  
   - [Setup without Docker](#setup-without-docker)  
-- [Features](#features)  
-- [Contribution](#contribution)  
-- [Developers](#developers)  
+- [Features](#features)   
 
 ---
 
@@ -21,29 +19,7 @@ AI Resume Builder is a sophisticated web application that leverages artificial i
 - **Backend:** Node.js, Express.js, Docker  
 - **Database:** MongoDB  
 
-## Demo
-
-🔗 Watch a demonstration on [YouTube](https://youtu.be/IBdpMBvtZhU)  
-
-🌐 Live demo: [AI Resume Builder](https://main--ai-resume-builder-07.netlify.app/)  
-
-![Thumbnail](./Screenshot/Thumbnil.png)
-
 ---
-## Installation
-
-To run AI Resume Builder locally, follow these steps:
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/sahidrajaansari/ai-resume-builder.git
-cd ai-resume-builder
-```
-
-### 2️⃣ Create Environment Files  
-
-Before proceeding, create the necessary environment files for **both frontend and backend**.
 
 #### 🔹 Backend (`Backend/.env`)  
 
