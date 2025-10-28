@@ -24,5 +24,7 @@ app.get('/', (req, res) => res.status(200).json({ status: 'ok' }));
 
 app.use("/api/users", userRouter);
 app.use("/api/resumes", resumeRouter);
+import aiRouter from "./routes/ai.routes.js";
+app.use("/api/ai", aiRouter);
 
 export default app;
