@@ -1,5 +1,50 @@
 node_modules
-package-lock.json
-npm-debug.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (will be passed via docker-compose)
 .env
+.env.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+server.log
+
+# Test files
+*.test.js
+*.spec.js
+coverage
+
+# Temporary files
+tmp_*
+*.tmp
+request.json
+resp.txt
+code.txt
+
+# Documentation
+README.md
+README_DOCKER.md
+
+# Docker files (don't need inside container)
+Dockerfile*
+docker-compose.yml
+.dockerignore
+
+# Scripts
+start.ps1
+scripts/try_models*

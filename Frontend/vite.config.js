@@ -9,4 +9,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: true, // Listen on all addresses (required for Docker)
+    port: 5173,
+    strictPort: true,
+    watch: {
+      usePolling: true, // Required for hot-reload in Docker
+    },
+  },
 })

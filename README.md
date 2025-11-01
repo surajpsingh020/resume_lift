@@ -7,6 +7,7 @@ AI Resume Builder is a sophisticated web application that leverages artificial i
 - [Features](#features)
 - [Tech Stack](#tech-stack)  
 - [Quick Start](#quick-start)
+- [Docker Deployment](#docker-deployment-recommended)
 - [Installation](#installation)
   - [Setup with Docker](#setup-with-docker)  
   - [Setup without Docker](#setup-without-docker)
@@ -95,6 +96,39 @@ npm run dev:clean
 # From project root
 .\start-all.ps1
 ```
+
+---
+
+## 🐳 Docker Deployment (Recommended)
+
+### Production (One-Click)
+```bash
+# Double-click this file
+docker-start-prod.bat
+
+# Or manually
+docker-compose up -d --build
+```
+**Access:** http://localhost (Frontend) | http://localhost:5001 (Backend)
+
+### Development (Hot-Reload Enabled)
+```bash
+# Double-click this file
+docker-start-dev.bat
+
+# Or manually
+docker-compose -f docker-compose.dev.yml up -d --build
+```
+**Access:** http://localhost:5173 (Frontend) | http://localhost:5001 (Backend)
+
+### Why Use Docker?
+- ✅ **One-command deployment** - No dependency installation needed
+- ✅ **Consistent environment** - Works the same everywhere
+- ✅ **Production-ready** - Optimized builds with Nginx
+- ✅ **Isolated services** - No port conflicts
+- ✅ **Easy scaling** - Deploy to any cloud platform
+
+**Complete guide:** See [DOCKER_GUIDE.md](DOCKER_GUIDE.md) for detailed documentation
 
 ---
 

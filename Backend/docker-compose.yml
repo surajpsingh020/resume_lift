@@ -1,31 +1,43 @@
+# Backend + MongoDB Only (Legacy)
+# NOTE: Use the root docker-compose.yml or docker-compose.dev.yml instead for full stack
 version: '3.8'
+
 services:
   mongodb:
     image: mongo:6.0
-    container_name: ai-resume-builder-db
+    container_name: ai-resume-builder-db-backend-only
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ai-resume-builder
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
-    networks:
-      default:
-        aliases:
-          - mongodb
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/ai-resume-builder --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: .
-    container_name: ai-resume-builder-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ai-resume-builder-backend-only
     ports:
       - "5001:5001"
     env_file:
       - .env
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_URI=mongodb://mongodb:27017/ai-resume-builder
       - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
     depends_on:
-      - mongodb
-    command: ["node", "src/index.js"]
+      mongodb:
+        condition: service_healthy
+    command: npm run dev
     restart: unless-stopped
 
 volumes:

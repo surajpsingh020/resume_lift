@@ -1,0 +1,71 @@
+# Development Docker Compose
+# Includes: Frontend (Vite with hot-reload), Backend (Nodemon), MongoDB
+# Development Docker Compose
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: ai-resume-builder-db-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ai-resume-builder
+    volumes:
+      - mongodb_data_dev:/data/db
+    networks:
+      - app-network-dev
+
+  # Backend API with hot-reload
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.dev
+    container_name: ai-resume-builder-backend-dev
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./Backend/.env
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/ai-resume-builder
+      - PORT=5001
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - app-network-dev
+    command: npm run dev
+
+  # Frontend with Vite hot-reload
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev
+    container_name: ai-resume-builder-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_APP_URL=http://localhost:5001/
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network-dev
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongodb_data_dev:
+    driver: local
+
+networks:
+  app-network-dev:
+    driver: bridge

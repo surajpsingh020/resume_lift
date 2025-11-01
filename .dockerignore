@@ -1,0 +1,65 @@
+# Root .dockerignore
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# Build files (will be generated in container)
+dist
+build
+.next
+out
+
+# Documentation
+*.md
+!README.md
+Screenshot/
+
+# Scripts
+*.bat
+*.ps1
+start-all.*
+docker-start-*
+docker-stop.*
+
+# Test files
+**/*.test.js
+**/*.spec.js
+coverage
+
+# Temporary files
+tmp
+temp
+*.tmp
+tmp_*
+request.json
+resp.txt
+code.txt
