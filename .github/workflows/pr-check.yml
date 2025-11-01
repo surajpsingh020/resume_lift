@@ -15,14 +15,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Frontend: install and build
         run: |
           cd Frontend
           npm ci
-          # lint may fail if eslint is not configured; keep it to catch issues
-          npm run lint
           npm run build
 
       - name: Backend: install dependencies

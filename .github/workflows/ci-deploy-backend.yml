@@ -31,7 +31,7 @@ jobs:
         with:
           context: ./Backend
           file: ./Backend/Dockerfile
-          push: true
+          push: false
           tags: |
             ghcr.io/${{ github.repository_owner }}/resume_lift-backend:latest
             ghcr.io/${{ github.repository_owner }}/resume_lift-backend:${{ github.sha }}
