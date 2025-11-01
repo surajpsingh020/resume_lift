@@ -13,12 +13,7 @@ function PreviewPage() {
     console.log("PreviewPage rendered ");
   }, [resumeData]);
   return (
-    <div
-      className={`shadow-lg h-full p-14 border-t-[20px]`}
-      style={{
-        borderColor: resumeData?.themeColor ? resumeData.themeColor : "#000000",
-      }}
-    >
+    <div className={`shadow-lg h-full p-14`}>
       <PersonalDeatailPreview resumeInfo={resumeData} />
       {}
       <SummaryPreview resumeInfo={resumeData} />

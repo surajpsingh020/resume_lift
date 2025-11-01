@@ -9,15 +9,18 @@ import { addResumeData } from "@/features/resume/resumeFeatures";
 export function EditResume() {
   const { resume_id } = useParams();
   const dispatch = useDispatch();
+  const [showSidePreview, setShowSidePreview] = React.useState(true);
+
   useEffect(() => {
     getResumeData(resume_id).then((data) => {
       dispatch(addResumeData(data.data));
     });
   }, [resume_id]);
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 p-10 gap-10">
-      <ResumeForm />
-      <PreviewPage />
+    <div className={`grid ${showSidePreview ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} p-10 gap-10`}>
+      <ResumeForm setShowSidePreview={setShowSidePreview} />
+      {showSidePreview && <PreviewPage />}
     </div>
   );
 }

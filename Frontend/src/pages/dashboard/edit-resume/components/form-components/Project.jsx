@@ -40,7 +40,6 @@ function Project({ resumeInfo, setEnabledNext, setEnabledPrev }) {
   const handleChange = (e, index) => {
     setEnabledNext(false);
     setEnabledPrev(false);
-    console.log("Type: ", typeof setEnabledPrev);
     const { name, value } = e.target;
     const list = [...projectList];
     const newListData = {
@@ -49,9 +48,18 @@ function Project({ resumeInfo, setEnabledNext, setEnabledPrev }) {
     };
     list[index] = newListData;
     setProjectList(list);
+    
+    // Immediate Redux dispatch for real-time preview updates
+    const updatedResumeInfo = { ...resumeInfo, projects: list };
+    dispatch(addResumeData(updatedResumeInfo));
   };
 
   const handleRichTextEditor = (value, name, index) => {
+    console.log('=== Project handleRichTextEditor ===');
+    console.log('Value length:', value?.length || 0);
+    console.log('Name:', name);
+    console.log('Index:', index);
+    
     const list = [...projectList];
     const newListData = {
       ...list[index],
@@ -59,6 +67,11 @@ function Project({ resumeInfo, setEnabledNext, setEnabledPrev }) {
     };
     list[index] = newListData;
     setProjectList(list);
+    
+    // Immediate Redux dispatch for real-time preview updates
+    const updatedResumeInfo = { ...resumeInfo, projects: list };
+    console.log('Dispatching to Redux:', updatedResumeInfo);
+    dispatch(addResumeData(updatedResumeInfo));
   };
 
   const onSave = () => {

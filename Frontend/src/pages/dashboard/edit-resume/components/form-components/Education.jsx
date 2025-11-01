@@ -2,13 +2,14 @@ import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Brain } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addResumeData } from "@/features/resume/resumeFeatures";
 import { useParams } from "react-router-dom";
 import { updateResumeData } from "@/Services/GlobalApi";
 import { toast } from "sonner";
 import { updateThisResume } from "@/Services/resumeAPI";
+import { AIChatSession } from "@/Services/AiModel";
 
 const formFields = {
   universityName: "",
@@ -27,6 +28,7 @@ function Education({ resumeInfo, enabledNext }) {
   const { resume_id } = useParams();
   const dispatch = useDispatch();
   const [loading, setLoading] = React.useState(false);
+  const [aiLoading, setAiLoading] = React.useState({});
 
   useEffect(() => {
     dispatch(addResumeData({ ...resumeInfo, education: educationalList }));
@@ -42,8 +44,22 @@ function Education({ resumeInfo, enabledNext }) {
 
   const onSave = () => {
     if (educationalList.length === 0) {
-      return toast("Please add atleast one education", "error");
+      return toast.error("Please add at least one education");
     }
+    
+    // Validate dates
+    for (let i = 0; i < educationalList.length; i++) {
+      const edu = educationalList[i];
+      if (edu.startDate && edu.endDate) {
+        const start = new Date(edu.startDate);
+        const end = new Date(edu.endDate);
+        if (start > end) {
+          toast.error(`Education ${i + 1}: End date must be after start date`);
+          return;
+        }
+      }
+    }
+    
     setLoading(true);
     const data = {
       data: {
@@ -54,10 +70,10 @@ function Education({ resumeInfo, enabledNext }) {
       console.log("Started Updating Education");
       updateThisResume(resume_id, data)
         .then((data) => {
-          toast("Resume Updated", "success");
+          toast.success("Education saved successfully!");
         })
         .catch((error) => {
-          toast("Error updating resume", `${error.message}`);
+          toast.error(`Failed to save education: ${error.message}`);
         })
         .finally(() => {
           setLoading(false);
@@ -74,6 +90,147 @@ function Education({ resumeInfo, enabledNext }) {
     };
     list[index] = newListData;
     setEducationalList(list);
+    
+    // Immediate Redux dispatch for real-time preview
+    dispatch(addResumeData({ ...resumeInfo, education: list }));
+  };
+
+  const GenerateDescriptionFromAI = async (index) => {
+    setAiLoading((prev) => ({ ...prev, [index]: true }));
+    
+    try {
+      const currentEducation = educationalList[index];
+      
+      // Extract keywords from current description input
+      const currentDescription = currentEducation?.description || "";
+      const descriptionKeywords = currentDescription
+        .toLowerCase()
+        .split(/\W+/)
+        .filter((word) => 
+          word.length > 3 && 
+          ![
+            "the", "and", "with", "using", "worked", "have", "been", "this",
+            "that", "from", "were", "which", "their", "about", "would",
+            "there", "could", "should", "these", "those", "into", "through",
+            "during", "before", "after", "above", "below", "between", "under"
+          ].includes(word)
+        )
+        .slice(0, 10);
+
+      console.log("Education Description Keywords:", descriptionKeywords);
+
+      // Get professional summary keywords
+      const professionalSummary = resumeInfo?.summary || "";
+      const summaryKeywords = professionalSummary
+        .toLowerCase()
+        .split(/\W+/)
+        .filter((word) => 
+          word.length > 3 && 
+          ![
+            "the", "and", "with", "using", "worked", "have", "been", "this",
+            "that", "from", "were", "which", "their", "about", "would",
+            "there", "could", "should", "these", "those", "into", "through"
+          ].includes(word)
+        )
+        .slice(0, 15);
+
+      console.log("Professional Summary Keywords:", summaryKeywords);
+
+      // Get user's skills
+      const userSkills = resumeInfo?.skills?.map(skill => skill.name).join(", ") || "";
+      console.log("User Skills:", userSkills);
+
+      // Combine keywords with priority: description input > professional summary > skills
+      const combinedKeywords = [
+        ...descriptionKeywords,
+        ...summaryKeywords,
+        ...userSkills.toLowerCase().split(/[,\s]+/).filter(w => w.length > 2)
+      ].filter(Boolean).slice(0, 25).join(", ");
+
+      console.log("Combined Keywords for Education:", combinedKeywords);
+
+      const prompt = `
+Generate 3-4 concise bullet points for an education description on a resume. Each bullet point should be SHORT (1-2 lines max) and professionally describe relevant coursework, academic achievements, or skills learned.
+
+Education Details:
+- University: ${currentEducation.universityName || "Not provided"}
+- Degree: ${currentEducation.degree || "Not provided"}
+- Major: ${currentEducation.major || "Not provided"}
+- Grade: ${currentEducation.grade ? `${currentEducation.grade} ${currentEducation.gradeType}` : "Not provided"}
+- Current Description Input: ${currentDescription || "None"}
+
+${combinedKeywords ? `Relevant Context/Keywords: ${combinedKeywords}` : ""}
+${userSkills ? `User's Technical Skills: ${userSkills}` : ""}
+
+Keep it concise and impactful. Focus on:
+- Relevant coursework related to the user's skills/career goals
+- Academic achievements or honors
+- Key projects or research
+- Technical skills or tools learned
+
+Return ONLY a pure JSON object in this exact format (no markdown, no code blocks):
+{
+  "summary": "<ul><li>First bullet point (1-2 lines)</li><li>Second bullet point (1-2 lines)</li><li>Third bullet point (1-2 lines)</li></ul>"
+}
+
+Example format (3 points, each 1-2 lines):
+{
+  "summary": "<ul><li>Completed advanced coursework in Data Structures, Algorithms, and Machine Learning with distinction</li><li>Led team project developing full-stack web application using React and Node.js, achieving 95% grade</li><li>Received Dean's List recognition for maintaining 3.8+ GPA across all semesters</li></ul>"
+}
+`;
+
+      console.log("AI Prompt for Education:", prompt);
+
+      const result = await AIChatSession.sendMessage(prompt);
+      const responseText = await result.response.text();
+      
+      console.log("Raw AI Response for Education:", responseText);
+
+      // Clean the response - remove markdown code blocks if present
+      let cleanedResponse = responseText
+        .replace(/```json\s*/g, "")
+        .replace(/```\s*/g, "")
+        .trim();
+
+      console.log("Cleaned AI Response:", cleanedResponse);
+
+      // Extract JSON if it's wrapped in other text
+      const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanedResponse = jsonMatch[0];
+      }
+
+      const parsedResponse = JSON.parse(cleanedResponse);
+      console.log("Parsed AI Response:", parsedResponse);
+
+      if (parsedResponse?.summary) {
+        // Convert HTML to plain text with bullet points
+        const htmlString = parsedResponse.summary;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlString;
+        
+        // Extract text from <li> elements and add bullet points
+        const listItems = tempDiv.querySelectorAll('li');
+        const plainTextBullets = Array.from(listItems)
+          .map(li => `• ${li.textContent.trim()}`)
+          .join('\n');
+        
+        console.log("Converted to plain text bullets:", plainTextBullets);
+
+        const list = [...educationalList];
+        list[index] = {
+          ...list[index],
+          description: plainTextBullets,
+        };
+        setEducationalList(list);
+        toast.success("Description generated successfully!");
+      }
+    } catch (error) {
+      console.error("Error generating description:", error);
+      toast.error("Failed to generate description. Please try again.");
+    } finally {
+      setAiLoading((prev) => ({ ...prev, [index]: false }));
+    }
   };
 
   return (
@@ -90,7 +247,7 @@ function Education({ resumeInfo, enabledNext }) {
                 <Input
                   name="universityName"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.universityName}
+                  value={item?.universityName || ""}
                 />
               </div>
               <div>
@@ -98,7 +255,7 @@ function Education({ resumeInfo, enabledNext }) {
                 <Input
                   name="degree"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.degree}
+                  value={item?.degree || ""}
                 />
               </div>
               <div>
@@ -106,25 +263,25 @@ function Education({ resumeInfo, enabledNext }) {
                 <Input
                   name="major"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.major}
+                  value={item?.major || ""}
                 />
               </div>
               <div>
                 <label>Start Date</label>
                 <Input
-                  type="date"
+                  type="month"
                   name="startDate"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.startDate}
+                  value={item?.startDate || ""}
                 />
               </div>
               <div>
                 <label>End Date</label>
                 <Input
-                  type="date"
+                  type="month"
                   name="endDate"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.endDate}
+                  value={item?.endDate || ""}
                 />
               </div>
               <div className="col-span-2">
@@ -134,7 +291,7 @@ function Education({ resumeInfo, enabledNext }) {
                     name="gradeType"
                     className="py-2 px-4 rounded-md"
                     onChange={(e) => handleChange(e, index)}
-                    value={item?.gradeType}
+                    value={item?.gradeType || "CGPA"}
                   >
                     <option value="CGPA">CGPA</option>
                     <option value="GPA">GPA</option>
@@ -144,16 +301,39 @@ function Education({ resumeInfo, enabledNext }) {
                     type="text"
                     name="grade"
                     onChange={(e) => handleChange(e, index)}
-                    defaultValue={item?.endDate}
+                    value={item?.grade || ""}
                   />
                 </div>
               </div>
               <div className="col-span-2">
-                <label>Description</label>
+                <div className="flex justify-between items-center mb-2">
+                  <label>Description</label>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-primary text-primary flex gap-2"
+                    type="button"
+                    disabled={aiLoading[index]}
+                    onClick={() => GenerateDescriptionFromAI(index)}
+                  >
+                    {aiLoading[index] ? (
+                      <>
+                        <LoaderCircle className="animate-spin" size={16} />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={16} />
+                        Generate from AI
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <Textarea
                   name="description"
                   onChange={(e) => handleChange(e, index)}
-                  defaultValue={item?.description}
+                  value={item?.description || ""}
+                  placeholder="Add relevant coursework, achievements, or skills learned..."
                 />
               </div>
             </div>

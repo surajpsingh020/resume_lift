@@ -153,4 +153,103 @@ const logoutUser = (req, res) => {
   }
 };
 
-export { start, loginUser, logoutUser, registerUser };
+const updateProfile = async (req, res) => {
+  console.log("Profile Update Started");
+  
+  if (!req.user) {
+    return res.status(401).json(new ApiError(401, "Unauthorized. Please login."));
+  }
+
+  const { fullName, contactNumber, permanentAddress, currentAddress } = req.body;
+
+  try {
+    const userId = req.user.id;
+    
+    // Build update object with only provided fields
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (contactNumber !== undefined) updateData.contactNumber = contactNumber;
+    if (permanentAddress !== undefined) updateData.permanentAddress = permanentAddress;
+    if (currentAddress !== undefined) updateData.currentAddress = currentAddress;
+
+    // Update user profile
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password'); // Exclude password from response
+
+    if (!updatedUser) {
+      console.log("Profile Update Failed: User not found");
+      return res.status(404).json(new ApiError(404, "User not found."));
+    }
+
+    console.log("Profile Update Successful");
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            id: updatedUser._id,
+            fullName: updatedUser.fullName,
+            email: updatedUser.email,
+            contactNumber: updatedUser.contactNumber,
+            permanentAddress: updatedUser.permanentAddress,
+            currentAddress: updatedUser.currentAddress,
+          },
+        },
+        "Profile updated successfully."
+      )
+    );
+  } catch (err) {
+    console.log("Profile Update Failed: Server error");
+    console.error("Error updating profile:", err);
+    return res
+      .status(500)
+      .json(new ApiError(500, "Internal Server Error", [], err.stack));
+  }
+};
+
+const getUserProfile = async (req, res) => {
+  console.log("Get Profile Started");
+  
+  if (!req.user) {
+    return res.status(401).json(new ApiError(401, "Unauthorized. Please login."));
+  }
+
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      console.log("Get Profile Failed: User not found");
+      return res.status(404).json(new ApiError(404, "User not found."));
+    }
+
+    console.log("Get Profile Successful");
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            contactNumber: user.contactNumber,
+            permanentAddress: user.permanentAddress,
+            currentAddress: user.currentAddress,
+          },
+        },
+        "Profile fetched successfully."
+      )
+    );
+  } catch (err) {
+    console.log("Get Profile Failed: Server error");
+    console.error("Error fetching profile:", err);
+    return res
+      .status(500)
+      .json(new ApiError(500, "Internal Server Error", [], err.stack));
+  }
+};
+
+export { start, loginUser, logoutUser, registerUser, updateProfile, getUserProfile };

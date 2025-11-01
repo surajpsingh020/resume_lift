@@ -10,24 +10,53 @@ import { AIChatSession } from "@/Services/AiModel";
 import { updateThisResume } from "@/Services/resumeAPI";
 
 const promptTemplate =
-  "Job Title: {jobTitle} ; Keywords: {keywords} ; Depending on the job title and the provided keywords, give me a list of summaries for 3 experience levels (Fresher, Mid Level, Senior) in 3-4 lines each. Return an array of objects with fields: summary and experience_level in JSON format.";
+  "Job Title: {jobTitle} ; Keywords: {keywords} ; Generate exactly 3 professional summaries for different experience levels (Fresher, Mid-Level, Senior) in 3-4 lines each. Return ONLY a valid JSON array with no additional text or explanation. Each object must have exactly these fields: summary (string) and experience_level (string). Format: [{\"summary\":\"...\",\"experience_level\":\"Fresher\"},{\"summary\":\"...\",\"experience_level\":\"Mid-Level\"},{\"summary\":\"...\",\"experience_level\":\"Senior\"}]";
+
 function Summary({ resumeInfo, enabledNext, enabledPrev }) {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false); // Declare the undeclared variable using useState
-  const [summary, setSummaryState] = useState(resumeInfo?.summary || ""); // Declare the undeclared variable using useState
-  const [aiGeneratedSummaryList, setAiGenerateSummaryList] = useState(null); // Declare the undeclared variable using useState
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummaryState] = useState(resumeInfo?.summary || "");
+  const [aiGeneratedSummaryList, setAiGenerateSummaryList] = useState(null);
+  const [autoSaveTimeout, setAutoSaveTimeout] = useState(null);
   const { resume_id } = useParams();
 
   const handleInputChange = (e) => {
     enabledNext(false);
     enabledPrev(false);
+    const newValue = e.target.value;
+    
     dispatch(
       addResumeData({
         ...resumeInfo,
-        [e.target.name]: e.target.value,
+        [e.target.name]: newValue,
       })
     );
-    setSummaryState(e.target.value);
+    setSummaryState(newValue);
+    
+    // Auto-save after 2 seconds of inactivity
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      autoSave(newValue);
+    }, 2000);
+    
+    setAutoSaveTimeout(timeout);
+  };
+
+  const autoSave = async (summaryText) => {
+    if (!resume_id) return;
+    
+    try {
+      const { updateThisResume } = await import("@/Services/resumeAPI");
+      await updateThisResume(resume_id, {
+        data: { summary: summaryText },
+      });
+      toast.success("Auto-saved", { duration: 1000 });
+    } catch (error) {
+      // Silent fail for auto-save
+    }
   };
 
   const onSave = (e) => {
@@ -71,24 +100,76 @@ function Summary({ resumeInfo, enabledNext, enabledPrev }) {
       setLoading(false);
       return;
     }
-      // Use the current textarea content as keywords; fallback to existing resume summary
-      const keywords = (summary && summary.trim()) || resumeInfo?.summary || "";
+      
+      // Gather context from the entire resume for more personalized suggestions
       const jobTitle = resumeInfo?.jobTitle || "";
-      const PROMPT = promptTemplate
-        .replace("{jobTitle}", jobTitle)
-        .replace("{keywords}", keywords);
-      if (!jobTitle && !keywords) {
-        toast("Please add a Job Title or some keywords in the Summary box before generating.");
-        setLoading(false);
-        return;
-      }
+      
+      // Extract skills
+      const skills = resumeInfo?.skill?.map(s => s.name).filter(Boolean).join(", ") || "";
+      
+      // Extract education
+      const education = resumeInfo?.education?.map(e => 
+        `${e.degree || ''} in ${e.major || ''} from ${e.universityName || ''}`
+      ).filter(e => e.trim() !== ' in  from ').join("; ") || "";
+      
+      // Extract experience titles for context
+      const experienceTitles = resumeInfo?.experience?.map(e => e.title).filter(Boolean).join(", ") || "";
+      
+      // Build enriched context
+      let contextString = `Job Title: ${jobTitle}`;
+      if (skills) contextString += ` | Skills: ${skills}`;
+      if (education) contextString += ` | Education: ${education}`;
+      if (experienceTitles) contextString += ` | Previous Roles: ${experienceTitles}`;
+      
+      const PROMPT = `Based on the following profile information:\n${contextString}\n\nGenerate exactly 3 professional summaries for different experience levels (Fresher, Mid-Level, Senior) in 3-4 lines each. Make them specific to the skills and background provided. Return ONLY a valid JSON array with no additional text or explanation. Each object must have exactly these fields: summary (string) and experience_level (string). Format: [{"summary":"...","experience_level":"Fresher"},{"summary":"...","experience_level":"Mid-Level"},{"summary":"...","experience_level":"Senior"}]`;
+      
+      console.log("AI Prompt with context:", PROMPT);
 
       try {
-      const result = await AIChatSession.sendMessage(PROMPT);
-      console.log(JSON.parse(result.response.text()));
-      setAiGenerateSummaryList(JSON.parse(result.response.text()));
-      toast("Summary Generated", "success");
-    } catch (error) {
+        const result = await AIChatSession.sendMessage(PROMPT);
+        let modelText = result.response.text();
+        
+        // Clean up the response: remove markdown code blocks if present
+        modelText = modelText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        
+        // Try to extract JSON array if it's embedded in text
+        const jsonMatch = modelText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          modelText = jsonMatch[0];
+        }
+        
+        console.log('Raw AI response:', modelText);
+        
+        // Attempt to parse the model text into a JS value and normalize to an array
+        let parsed = null;
+        try {
+          parsed = JSON.parse(modelText);
+        } catch (e) {
+          console.warn('JSON parse failed, trying response.json() helper:', e);
+          // If parsing fails, try response.json() helper (added in AiModel)
+          parsed = result.response.json ? result.response.json() : null;
+        }
+
+        // Normalize to an array of suggestion objects
+        if (!Array.isArray(parsed)) {
+          if (parsed && typeof parsed === 'object') {
+            // If it's an object with keys, try to find an array value
+            const arr = Object.values(parsed).find(v => Array.isArray(v));
+            parsed = arr || [parsed];
+          } else if (typeof parsed === 'string' && parsed.trim()) {
+            parsed = [{ summary: parsed, experience_level: 'Generated' }];
+          } else {
+            console.error('Could not parse AI response into array:', parsed);
+            toast("AI returned unexpected format. Please try again.", "error");
+            setLoading(false);
+            return;
+          }
+        }
+
+        console.log('Parsed suggestions:', parsed);
+        setAiGenerateSummaryList(parsed);
+        toast("Summary Generated", "success");
+      } catch (error) {
       console.log(error);
       const msg = error?.message || "AI generation failed";
       toast(msg, "error");

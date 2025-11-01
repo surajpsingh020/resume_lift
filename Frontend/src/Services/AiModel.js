@@ -1,9 +1,5 @@
 import { API_BASE, GEMINI_MODEL, VITE_APP_URL } from "../config/config";
 
-// For backward compatibility other modules import AIChatSession and call
-// AIChatSession.sendMessage(prompt). We'll provide a thin wrapper that
-// forwards the prompt to the backend proxy at `${VITE_APP_URL}api/ai/generate`.
-
 const endpointBase = VITE_APP_URL || API_BASE || "/";
 
 const AIChatSession = {
@@ -29,11 +25,48 @@ const AIChatSession = {
 
     const data = await res.json();
 
-    // To keep the existing consumer code working (which expects
-    // result.response.text()), return an object with response.text().
+    const extractModelText = (d) => {
+      try {
+        if (!d) return '';
+        // If it's already a string, return as-is
+        if (typeof d === 'string') return d;
+
+        // If data has candidates (client SDK shape)
+        if (d.candidates && Array.isArray(d.candidates) && d.candidates.length > 0) {
+          // Concatenate all parts text from first candidate
+          const cand = d.candidates[0];
+          const parts = cand?.content?.parts;
+          if (Array.isArray(parts)) {
+            return parts.map(p => p.text || '').join('');
+          }
+        }
+
+        // If it's wrapped under data.data (double-wrapped ApiResponse), unwrap
+        if (d.data) {
+          return extractModelText(d.data);
+        }
+
+        // Fallback: stringify the whole object
+        return JSON.stringify(d);
+      } catch (e) {
+        return '';
+      }
+    };
+
+    const modelText = extractModelText(data);
+
     return {
       response: {
-        text: () => JSON.stringify(data),
+        // Keep the same API (text()) so existing code doesn't need changes.
+        text: () => modelText,
+        // Provide a convenience json() to return parsed JSON when possible
+        json: () => {
+          try {
+            return JSON.parse(modelText);
+          } catch (e) {
+            return null;
+          }
+        }
       },
     };
   },

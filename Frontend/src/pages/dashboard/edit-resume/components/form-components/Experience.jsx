@@ -29,13 +29,8 @@ function Experience({ resumeInfo, enabledNext, enabledPrev }) {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    try {
-      dispatch(addResumeData({ ...resumeInfo, experience: experienceList }));
-    } catch (error) {
-      console.log("error in experience context update", error.message);
-    }
-  }, [experienceList]);
+  // Removed automatic useEffect dispatch to prevent conflicts
+  // Now dispatching directly in handlers for immediate updates
 
   const addExperience = () => {
     if (!experienceList) {
@@ -64,16 +59,27 @@ function Experience({ resumeInfo, enabledNext, enabledPrev }) {
     };
     list[index] = newListData;
     setExperienceList(list);
+    // Immediately dispatch to Redux for preview update
+    dispatch(addResumeData({ ...resumeInfo, experience: list }));
   };
 
   const handleRichTextEditor = (value, name, index) => {
+    console.log('=== Experience handleRichTextEditor ===');
+    console.log('Index:', index, 'Name:', name);
+    console.log('Value preview:', value?.substring(0, 100));
+    enabledNext(false);
+    enabledPrev(false);
     const list = [...experienceList];
     const newListData = {
       ...list[index],
       [name]: value,
     };
     list[index] = newListData;
+    console.log('Updated experience list:', list[index]);
     setExperienceList(list);
+    // Immediately dispatch to Redux for preview update
+    dispatch(addResumeData({ ...resumeInfo, experience: list }));
+    console.log('Dispatched to Redux');
   };
 
   const onSave = () => {
@@ -167,7 +173,7 @@ function Experience({ resumeInfo, enabledNext, enabledPrev }) {
                 <div>
                   <label className="text-xs">StartDate</label>
                   <Input
-                    type="date"
+                    type="month"
                     name="startDate"
                     value={experience?.startDate}
                     onChange={(e) => {
@@ -178,7 +184,7 @@ function Experience({ resumeInfo, enabledNext, enabledPrev }) {
                 <div>
                   <label className="text-xs">End Date</label>
                   <Input
-                    type="date"
+                    type="month"
                     name="endDate"
                     value={experience?.endDate}
                     onChange={(e) => {
@@ -189,9 +195,8 @@ function Experience({ resumeInfo, enabledNext, enabledPrev }) {
                 <div className="col-span-2">
                   <RichTextEditor
                     index={index}
-                    defaultValue={experience?.workSummary}
-                    onRichTextEditorChange={(event) =>
-                      handleRichTextEditor(event, "workSummary", index)
+                    onRichTextEditorChange={(newValue) =>
+                      handleRichTextEditor(newValue, "workSummary", index)
                     }
                     resumeInfo={resumeInfo}
                   />

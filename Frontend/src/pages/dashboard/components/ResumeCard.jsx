@@ -14,6 +14,12 @@ import { Button } from "@/components/ui/button";
 import { deleteThisResume } from "@/Services/resumeAPI";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import PersonalDeatailPreview from "../edit-resume/components/preview-components/PersonalDeatailPreview";
+import SummaryPreview from "../edit-resume/components/preview-components/SummaryPreview";
+import ExperiencePreview from "../edit-resume/components/preview-components/ExperiencePreview";
+import EducationalPreview from "../edit-resume/components/preview-components/EducationalPreview";
+import SkillsPreview from "../edit-resume/components/preview-components/SkillsPreview";
+import ProjectPreview from "../edit-resume/components/preview-components/ProjectPreview";
 
 const gradients = [
   "from-indigo-500 via-purple-500 to-pink-500",
@@ -49,36 +55,72 @@ function ResumeCard({ resume, refreshData }) {
   };
   return (
     <div
-      className={`p-5 bg-gradient-to-r ${gradient} h-[380px] sm:h-auto rounded-lg flex flex-col justify-between shadow-lg transition duration-300 ease-in-out cursor-pointer hover:shadow-xl`}
+      className={`bg-white rounded-lg flex flex-col shadow-lg transition duration-300 ease-in-out hover:shadow-xl hover:scale-[1.02] border border-gray-200`}
     >
-      <div className="flex items-center justify-center p-6 bg-white rounded-t-lg shadow-md">
-        <h2
-          className={`text-center font-bold text-md mx-2 bg-clip-text text-transparent bg-gradient-to-r ${gradient}`}
-        >
+      {/* Resume Title Header */}
+      <div className={`p-4 bg-gradient-to-r ${gradient} rounded-t-lg`}>
+        <h2 className="text-center font-bold text-lg text-white truncate">
           {resume.title}
         </h2>
       </div>
-      <div className="flex items-center justify-around p-4 bg-white rounded-b-lg shadow-md">
+
+      {/* Resume Preview */}
+      <div 
+        className="relative bg-white overflow-hidden cursor-pointer"
+        onClick={() => navigate(`/dashboard/view-resume/${resume._id}`)}
+        style={{ height: '400px' }}
+      >
+        <div 
+          className="absolute inset-0 overflow-hidden pointer-events-none"
+          style={{
+            transform: 'scale(0.35)',
+            transformOrigin: 'top left',
+            width: '285%',
+            height: '285%'
+          }}
+        >
+          <div
+            className="shadow-lg h-full p-14 bg-white"
+          >
+            <PersonalDeatailPreview resumeInfo={resume} />
+            <SummaryPreview resumeInfo={resume} />
+            {resume?.experience && <ExperiencePreview resumeInfo={resume} />}
+            {resume?.projects && <ProjectPreview resumeInfo={resume} />}
+            {resume?.education && <EducationalPreview resumeInfo={resume} />}
+            {resume?.skills && <SkillsPreview resumeInfo={resume} />}
+          </div>
+        </div>
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center pointer-events-none">
+          <FaEye className="text-white text-4xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center justify-around p-4 bg-gray-50 rounded-b-lg border-t">
         <Button
           variant="ghost"
           onClick={() => navigate(`/dashboard/view-resume/${resume._id}`)}
-          className="mx-2"
+          className="mx-1 hover:bg-indigo-100"
+          title="View Resume"
         >
           <FaEye className="text-gray-600 hover:text-indigo-600 transition duration-300 ease-in-out" />
         </Button>
         <Button
           variant="ghost"
           onClick={() => navigate(`/dashboard/edit-resume/${resume._id}`)}
-          className="mx-2"
+          className="mx-1 hover:bg-purple-100"
+          title="Edit Resume"
         >
           <FaEdit className="text-gray-600 hover:text-purple-600 transition duration-300 ease-in-out" />
         </Button>
         <Button
           variant="ghost"
           onClick={() => setOpenAlert(true)}
-          className="mx-2"
+          className="mx-1 hover:bg-red-100"
+          title="Delete Resume"
         >
-          <FaTrashAlt className="text-gray-600 hover:text-pink-600 transition duration-300 ease-in-out" />
+          <FaTrashAlt className="text-gray-600 hover:text-red-600 transition duration-300 ease-in-out" />
         </Button>
         <AlertDialog open={openAlert} onClose={() => setOpenAlert(false)}>
           <AlertDialogContent>

@@ -1,8 +1,31 @@
 import React from "react";
 
 function ProjectPreview({ resumeInfo }) {
+  const handleLinkClick = (e) => {
+    console.log('Click detected on:', e.target.tagName, e.target);
+    
+    // Check if the clicked element or its parent is a link
+    let target = e.target;
+    while (target && target !== e.currentTarget) {
+      if (target.tagName === 'A') {
+        e.preventDefault();
+        e.stopPropagation();
+        const href = target.getAttribute('href');
+        console.log('Link clicked! href:', href);
+        if (href) {
+          // Ensure href has protocol
+          const fullHref = href.startsWith('http') ? href : `https://${href}`;
+          console.log('Opening URL:', fullHref);
+          window.open(fullHref, '_blank', 'noopener,noreferrer');
+        }
+        return;
+      }
+      target = target.parentElement;
+    }
+  };
+
   return (
-    <div className="my-6">
+    <div className="my-6" onClick={handleLinkClick}>
       {resumeInfo?.projects.length > 0 && (
         <div>
           <h2
@@ -37,7 +60,7 @@ function ProjectPreview({ resumeInfo }) {
             )}
           </h2>
           <div
-            className="text-xs my-2"
+            className="text-xs my-2 project-content"
             dangerouslySetInnerHTML={{ __html: project?.projectSummary }}
           />
         </div>

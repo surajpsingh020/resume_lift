@@ -36,8 +36,23 @@ function PersonalDetails({ resumeInfo, enabledNext }) {
   };
 
   const onSave = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
+    // Validate phone format (basic check)
+    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+    
+    setLoading(true);
     console.log("Personal Details Save Started");
     const data = {
       data: {

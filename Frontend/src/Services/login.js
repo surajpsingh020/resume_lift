@@ -53,4 +53,26 @@ const logoutUser = async () => {
   }
 };
 
-export { startUser, registerUser, loginUser, logoutUser };
+const getUserProfile = async () => {
+  try {
+    const response = await axiosInstance.get("users/profile/");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || error?.message || "Something Went Wrong"
+    );
+  }
+};
+
+const updateUserProfile = async (data) => {
+  try {
+    const response = await axiosInstance.put("users/profile/", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || error?.message || "Something Went Wrong"
+    );
+  }
+};
+
+export { startUser, registerUser, loginUser, logoutUser, getUserProfile, updateUserProfile };

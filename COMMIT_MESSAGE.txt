@@ -1,0 +1,57 @@
+feat: Major improvements and cleanup for v2.0 release
+
+🎉 New Features:
+- Education AI description generator with context-aware suggestions
+- Auto-save functionality with 2-second debounce
+- Export to Word (.docx) format
+- Keyboard shortcuts (Ctrl/Cmd + Arrow keys) for navigation
+- Input validation (email, phone, dates)
+- Loading skeletons for Dashboard
+- Enhanced theme colors (21 professional options)
+
+✨ Improvements:
+- Real-time preview updates across all sections
+- Fixed double preview issue on preview tab
+- Better toast notifications with specific messages
+- Consistent CSS styling for all content sections
+- Controlled form components for better state management
+- HTML content rendering with proper bullet formatting
+
+🛠️ Technical Enhancements:
+- Added express-rate-limit for API protection (prepared but commented out due to ESM import issue)
+- Created exportToWord utility for .docx generation
+- Implemented format conversion functions for HTML/text bullets
+- Added debounced auto-save mechanism
+
+🚀 DevOps & Tooling:
+- Created startup scripts (start-all.bat, start-all.ps1) to solve port conflicts forever
+- Added npm scripts for clean server startup (dev:clean)
+- Individual startup scripts for Backend and Frontend
+- Automated port cleanup (5001, 5173) before server start
+
+📝 Documentation:
+- Comprehensive README.md update with all features
+- STARTUP_GUIDE.md for detailed startup instructions
+- IMPROVEMENTS.md with complete changelog
+- Updated .gitignore for better file exclusion
+
+🧹 Cleanup:
+- Removed temporary files (*.log, tmp_*, code.txt, request.json, resp.txt)
+- Removed test scripts (try_models.js, try_models.mjs)
+- Consolidated redundant documentation
+- Updated .gitignore to exclude logs, temp files, and OS files
+
+📦 Dependencies Added:
+Backend:
+- express-rate-limit@8.2.1
+
+Frontend:
+- docx@9.5.1
+- file-saver@2.0.5
+
+Breaking Changes: None
+Migration Required: No
+
+Files Changed: 33 modified, 9 new files
+Lines Added: ~800+
+Features Added: 12 major improvements

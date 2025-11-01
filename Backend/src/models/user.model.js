@@ -17,6 +17,22 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  contactNumber: {
+    type: String,
+    default: ''
+  },
+  permanentAddress: {
+    type: String,
+    default: ''
+  },
+  currentAddress: {
+    type: String,
+    default: ''
+  },
+  profileImage: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 
