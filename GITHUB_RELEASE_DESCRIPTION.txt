@@ -1,0 +1,140 @@
+🚀 AI Resume Builder v2.0 - Docker Edition
+
+Major Features:
+
+✨ AI-Powered Content Generation
+- Smart education descriptions using Google Gemini 2.5 Flash
+- Keyword extraction and context-aware summaries
+- One-click AI generation with loading states
+
+💾 Enhanced User Experience
+- Auto-save every 2 seconds - never lose your work!
+- Export to Word (.docx) with professional formatting
+- Keyboard shortcuts (Ctrl+← / Ctrl+→) for form navigation
+- Real-time preview updates
+- Input validation for email and phone numbers
+- Loading skeletons for better UX
+
+🎨 Design Improvements
+- 21 professional theme colors - choose from curated palette
+- Improved toast notifications with icons and better positioning
+- Fixed double preview bug on Skills page
+- Responsive design across all devices
+
+🐳 Complete Docker Support
+- Production-ready multi-stage builds (Frontend: ~50MB, Backend: ~150MB)
+- Development environment with hot-reload enabled
+- One-click startup scripts: docker-start-prod.bat, docker-start-dev.bat
+- Health checks for all services
+- Security best practices: Non-root user, security headers, secrets management
+- Nginx configuration: Gzip compression, SPA routing, 1-year asset caching
+
+📦 Quick Start
+
+Docker (Recommended):
+```
+git clone https://github.com/surajpsingh020/resume_lift.git
+cd resume_lift
+docker-start-prod.bat
+
+Frontend: http://localhost:8080
+Backend: http://localhost:5001
+```
+
+Local Development:
+```
+start-all.bat
+```
+
+🛠️ Tech Stack
+- Frontend: React 18.3, Vite 5.3, Redux Toolkit, Tailwind CSS, Shadcn/ui
+- Backend: Node.js v22, Express 4.19, Mongoose 8.5, JWT auth
+- AI: Google Generative AI (Gemini 2.5 Flash)
+- Database: MongoDB Atlas (cloud)
+- Docker: node:20-alpine, nginx:alpine
+
+🔧 Configuration
+
+Backend .env (required):
+MONGODB_URI=your_mongodb_connection_string_here
+JWT_SECRET=your_jwt_secret_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+ALLOWED_SITE=http://localhost:8080
+NODE_ENV=Dev
+
+Frontend .env.local:
+VITE_APP_URL=http://localhost:5001/
+VITE_GEMINI_MODEL=models/gemini-2.5-flash
+
+📚 Documentation
+- README.md - Project overview & features
+- DOCKER_GUIDE.md - Comprehensive Docker guide (500+ lines)
+- DOCKER_OPTIONS.md - Deployment strategy comparison
+- IMPROVEMENTS.md - Detailed v2.0 changelog
+- RELEASE_NOTES_v2.0.md - Complete release notes
+
+🎯 What's New (12 Major Improvements)
+
+1. ✅ AI-powered education descriptions with keyword extraction
+2. ✅ Auto-save with 2-second debounce
+3. ✅ Export to Word (.docx) functionality
+4. ✅ Keyboard navigation shortcuts
+5. ✅ Input validation (email, phone)
+6. ✅ Professional loading skeletons
+7. ✅ 21 theme colors
+8. ✅ Real-time preview updates
+9. ✅ Improved toast notifications
+10. ✅ Fixed double preview bug
+11. ✅ Better CSS coverage
+12. ✅ Complete Docker setup
+
+🐛 Known Issues
+- Rate limiting code commented out (ESM import issue with Node.js v22)
+- Debug console.logs present (~150 instances for development)
+- Local MongoDB container defined but using Atlas (cloud) by default
+
+📊 Stats
+- 21 files changed
+- 1,445 insertions, 155 deletions
+- Latest commit: 34a9cb0 - Added release notes
+
+🚀 Deployment Options
+
+| Option | Best For | Command |
+|--------|----------|---------|
+| Docker Production | Production deployments | docker-start-prod.bat |
+| Docker Development | Team development | docker-start-dev.bat |
+| Local Development | Active development | start-all.bat |
+
+See DOCKER_OPTIONS.md for detailed comparison.
+
+🔄 Migration from v1.x
+✅ Fully backward compatible - No breaking changes
+✅ Existing databases work without modifications
+✅ Environment variables remain the same
+
+🎯 Roadmap (v2.1+)
+- Re-enable rate limiting (fix ESM import)
+- Remove debug console.logs
+- Add PDF export option
+- Multiple resume templates
+- Multi-language support
+- GitHub Actions CI/CD
+- Automated testing (Jest, Cypress)
+- Resume analytics dashboard
+
+👤 Author
+@surajpsingh020
+
+🙏 Acknowledgments
+- Google Gemini API for AI generation
+- MongoDB Atlas for cloud database
+- Shadcn/ui for beautiful components
+- Docker & Nginx for containerization
+
+⭐ If you find this project helpful, please star the repository!
+
+🐛 Found a bug? Open an issue: https://github.com/surajpsingh020/resume_lift/issues
+💡 Have a feature request? Start a discussion: https://github.com/surajpsingh020/resume_lift/discussions
+
+Full changelog: https://github.com/surajpsingh020/resume_lift/commits/main

@@ -151,11 +151,11 @@ Create `Backend/.env` from `Backend/.env.example`:
 
 ```env
 # Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+MONGODB_URI=your_mongodb_connection_string_here
 NODE_ENV=Dev
 
 # Authentication
-JWT_SECRET=your_super_secret_jwt_key
+JWT_SECRET=your_jwt_secret_key_here
 
 # AI
 GEMINI_API_KEY=your_gemini_api_key_here
