@@ -19,8 +19,16 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Health endpoint for quick smoke tests
+// Health check endpoints
 app.get('/', (req, res) => res.status(200).json({ status: 'ok' }));
+app.get('/healthz', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 app.use("/api/users", userRouter);
 app.use("/api/resumes", resumeRouter);
