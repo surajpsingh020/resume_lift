@@ -286,43 +286,12 @@ See `IMPROVEMENTS.md` for complete changelog.
 
 ---
 
-## 📸 Screenshots
-
-### Authentication
-![Sign In](./Screenshot/SignIn.png)  
-![Sign Up](./Screenshot/SignUp.png)  
-
-### Dashboard & Templates
-![User Dashboard](./Screenshot/Dashboard.png)  
-![Template Customization](./Screenshot/ThemeCust.png)  
-
-### AI Features
-![AI Suggestions](./Screenshot/AI%20Suggestions.png)  
-
-### Live Preview & Export
-![Live Preview](./Screenshot/Screenshot%202024-07-08%20233753.png)  
-![Download & Share](./Screenshot/downloadShare.png)  
-
----
-
 ## 📝 Additional Documentation
 
 - **STARTUP_GUIDE.md** - Detailed startup script documentation
 - **QUICK_START.md** - Quick reference for starting the application
 - **IMPROVEMENTS.md** - Complete changelog of recent improvements
 - **DEPLOYMENT.md** - Deployment guidelines
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
